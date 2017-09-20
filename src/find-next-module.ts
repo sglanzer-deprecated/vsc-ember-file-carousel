@@ -192,7 +192,7 @@ function findModules (rootPath, projectType, filePath) {
   }, [])
 }
 
-function findNextModule (rootPath, projectType, filePath) {
+function findNextModule (rootPath, projectType, filePath, direction) {
   let specificProjectType = projectType
   if (projectType === 'addon' && filePath.includes('dummy')) {
     specificProjectType = 'dummy'
@@ -218,7 +218,11 @@ function findNextModule (rootPath, projectType, filePath) {
     let nextModuleIndex = moduleIndexInModuleGroup // Start at the source module
     let nextModulePathInstance = null
     while (modulesChecked < moduleGroup.length - 1) { // No need to loop back to the source module
-      nextModuleIndex = moduleGroup.length - 1 === nextModuleIndex ? 0 : nextModuleIndex + 1 // Increment or loop back to the start
+      if (direction === 'next') {
+        nextModuleIndex = nextModuleIndex === moduleGroup.length - 1 ? 0 : nextModuleIndex + 1 // Increment or loop back to the start
+      } else if (direction === 'previous') {
+        nextModuleIndex = nextModuleIndex === 0 ? moduleGroup.length - 1 : nextModuleIndex - 1 // Decrement or loop back to the end
+      }
 
       // Check to see if the module exists in the file system
       const nextModuleKey = moduleGroup[nextModuleIndex]

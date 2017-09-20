@@ -11,23 +11,35 @@
         "Other"
     ],
     "activationEvents": [
-      "onCommand:extension.emberFileCarousel"
+      "onCommand:extension.emberFileCarouselNext",
+      "onCommand:extension.emberFileCarouselPrevious"
     ],
     "main": "./out/src/extension",
     "contributes": {
       "commands": [
           {
-            "command": "extension.emberFileCarousel",
-            "title": "Ember file carousel"
+            "command": "extension.emberFileCarouselNext",
+            "title": "Ember file carousel - next"
+          },
+          {
+            "command": "extension.emberFileCarouselPrevious",
+            "title": "Ember file carousel - previous"
           }
       ],
       "keybindings": [
           {
-            "mac": "cmd+shift+r",
-            "win": "ctrl+shift+r",
-            "linux": "ctrl+shift+r",
-            "key": "ctrl+shift+r",
-            "command": "extension.emberFileCarousel"
+            "mac": "ctrl+cmd+shift+n",
+            "win": "ctrl+alt+shift+n",
+            "linux": "ctrl+alt+shift+n",
+            "key": "ctrl+alt+shift+n",
+            "command": "extension.emberFileCarouselNext"
+          },
+          {
+            "mac": "ctrl+cmd+shift+p",
+            "win": "ctrl+alt+shift+p",
+            "linux": "ctrl+alt+shift+p",
+            "key": "ctrl+alt+shift+p",
+            "command": "extension.emberFileCarouselPrevious"
           }
       ]
     },
