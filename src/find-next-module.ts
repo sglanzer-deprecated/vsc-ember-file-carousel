@@ -4,7 +4,6 @@ const path = require('path')
 const { join } = path
 
 // TODO: Behaviour files for tests (needs blueprint updates)
-// TODO: Engines (enhance addon)
 // TODO: Dummy apps
 const modules = {
   addon: {
@@ -31,6 +30,25 @@ const modules = {
     // Mixin
     'mixin': 'addon/mixins/{{name}}.js',
     'mixin-unit-test': 'tests/unit/mixins/{{name}}-test.js',
+
+    // Model / Adapter / Serializer / Transform
+    'model': 'addon/models/{{name}}.js',
+    'model-unit-test': 'tests/unit/models/{{name}}-test.js',
+    'adapter-js': 'addon/adapters/{{name}}.js',
+    'adapter-unit-test': 'tests/unit/adapters/{{name}}-test.js',
+    'serializer': 'adoon/serializers/{{name}}.js',
+    'serializer-unit-test': 'tests/unit/serializers/{{name}}-test.js',
+    'transform': 'addon/transforms/{{name}}.js',
+    'transform-unit-test': 'tests/unit/transforms/{{name}}-test.js',
+
+    // Route / Controller
+    'route-js': 'addon/routes/{{name}}.js',
+    'controller-js': 'addon/controllers/{{name}}.js',
+    'route-hbs': 'addon/templates/{{name}}.hbs',
+    'route-css': 'addon/styles/{{name}}.css',
+    'route-acceptance-test': 'tests/acceptance/routes/{{name}}-test.js',
+    'route-unit-test': 'tests/unit/routes/{{name}}-test.js',
+    'controller-unit-test': 'tests/unit/controllers/{{name}}-test.js',
 
     // Service
     'service': 'addon/services/{{name}}.js',
@@ -114,77 +132,86 @@ const moduleGroups = [
   ['util', 'util-unit-test']
 ]
 
+function createPathRegex (path) {
+  const pathRegex = `^${path
+    .replace(/\//g, '\\/')
+    .replace(/\./g, '\\.')
+    .replace('{{name}}', '(?!.*-components)(.+)') // To support local components don't include -components in the name capture
+    .replace('{{prefix}}', '(.+)')
+  }$`
+  return new RegExp(pathRegex)
+}
+
 function getModules (projectType) {
   return Object.keys(modules[projectType]).map(key => {
     return { key, path: modules[projectType][key] }
   })
 }
 
-function findModule (rootPath, projectType, filePath) {
-  let regex = null
-  const module = getModules(projectType).find(module => {
-    const pathRegex = `^${module.path
-      .replace(/\//g, '\\/')
-      .replace(/\./g, '\\.')
-      .replace('{{name}}', '(?!.*-components)(.+)') // Don't include -components in the name capture to support local components
-      .replace('{{prefix}}', '(.+)')
-    }$`
-    regex = new RegExp(pathRegex)
-    return regex.exec(filePath)
-  })
-
-  if (module) {
+function findModules (rootPath, projectType, filePath) {
+  return getModules(projectType).reduce((matchingModules, module) => {
+    const regex = createPathRegex(module.path)
     const match = regex.exec(filePath)
 
-    let name = null
-    let prefix = null
-    if (match.length === 3) {
-      prefix = match[1]
-      name = match[2]
-    } else {
-      name = match[1]
+    if (match) {
+      let name = null
+      let prefix = null
+      if (match.length === 3) {
+        prefix = match[1]
+        name = match[2]
+      } else {
+        name = match[1]
+      }
+
+      matchingModules.push(Object.assign({}, module, { name, prefix }))
     }
 
-    return Object.assign({}, module, { name, prefix })
-  }
-
-  return
+    return matchingModules
+  }, [])
 }
 
 function findNextModule (rootPath, projectType, filePath) {
-  const module = findModule(rootPath, projectType, filePath)
+  const modules = findModules(rootPath, projectType, filePath)
 
-  if (!module) {
+  if (!modules) {
     return
   }
 
-  const { key, name, prefix } = module
+  // In engines both the route and component groups share the same css path so
+  // both modules are returned.  We need to check both module groups to find the
+  // next module
+  for (let moduleIndex = 0; moduleIndex < modules.length; moduleIndex++) {
+    const { key, name, prefix } = modules[moduleIndex]
 
-  const moduleGroup = moduleGroups
-    .find(moduleGroup => moduleGroup.indexOf(key) !== -1)
+    const moduleGroup = moduleGroups.find(moduleGroup => moduleGroup.indexOf(key) !== -1)
 
-  const moduleIndexInModuleGroup = moduleGroup.indexOf(key)
+    const moduleIndexInModuleGroup = moduleGroup.indexOf(key)
 
-  let modulesChecked = 0
-  let nextModuleIndex = moduleIndexInModuleGroup // Start at the source module
-  let nextModulePathInstance = null
-  while (modulesChecked < moduleGroup.length - 1) { // No need to loop back to the source module
-    nextModuleIndex = moduleGroup.length - 1 === nextModuleIndex ? 0 : nextModuleIndex + 1 // Increment or loop back to the start
+    let modulesChecked = 0
+    let nextModuleIndex = moduleIndexInModuleGroup // Start at the source module
+    let nextModulePathInstance = null
+    while (modulesChecked < moduleGroup.length - 1) { // No need to loop back to the source module
+      nextModuleIndex = moduleGroup.length - 1 === nextModuleIndex ? 0 : nextModuleIndex + 1 // Increment or loop back to the start
 
-    // Check to see if the module exists in the file system
-    const nextModuleKey = moduleGroup[nextModuleIndex]
-    const nextModule = getModules(projectType).find(module => module.key === nextModuleKey)
-    const { path: nextModulePath } = nextModule
-    const _nextModulePathInstance = nextModulePath.replace('{{name}}', name).replace('{{prefix}}', prefix)
-    if (fs.existsSync(path.join(rootPath, _nextModulePathInstance))) {
-      nextModulePathInstance = _nextModulePathInstance
-      break
+      // Check to see if the module exists in the file system
+      const nextModuleKey = moduleGroup[nextModuleIndex]
+      const nextModule = getModules(projectType).find(module => module.key === nextModuleKey)
+      const { path: nextModulePath } = nextModule
+      const _nextModulePathInstance = nextModulePath.replace('{{name}}', name).replace('{{prefix}}', prefix)
+      if (fs.existsSync(path.join(rootPath, _nextModulePathInstance))) {
+        nextModulePathInstance = _nextModulePathInstance
+        break
+      }
+
+      modulesChecked = modulesChecked + 1
     }
 
-    modulesChecked = modulesChecked + 1
+    if (nextModulePathInstance) {
+      return nextModulePathInstance
+    }
   }
 
-  return nextModulePathInstance
+  return
 }
 
 export default findNextModule
