@@ -4,13 +4,41 @@ const path = require('path')
 const { join } = path
 
 // TODO: Route / component styles
-// TODO: Test behaviours
-// TODO: Addons
+// TODO: Test behaviours (needs blueprint updates)
 // TODO: Engines
 // TODO: Dummy apps
 const modules = {
   addon: {
+    // Component
+    'component-js': 'addon/components/{{name}}.js',
+    'component-hbs': 'addon/templates/components/{{name}}.hbs',
+    'component-integration-test': 'tests/integration/components/{{name}}-test.js',
+    'component-unit-test': 'tests/unit/components/{{name}}-test.js',
 
+    // Helper
+    'helper-js': 'addon/helpers/{{name}}.js',
+    'helper-integration-test': 'tests/integration/helpers/{{name}}-test.js',
+    'helper-integration-test-behaviours': 'tests/integration/helpers/behaviours/{{name}}-test.js',
+
+    // Initializer
+    'initializer': 'addon/initializers/{{name}}.js',
+    'initializer-unit-test': 'tests/unit/initializers/{{name}}-test.js',
+
+    // Instance initializer
+    'instance-initializer': 'addon/instance-initializers/{{name}}.js',
+    'instance-initializer-unit-test': 'tests/unit/instance-initializers/{{name}}-test.js',
+
+    // Mixin
+    'mixin': 'addon/mixins/{{name}}.js',
+    'mixin-unit-test': 'tests/unit/mixins/{{name}}-test.js',
+
+    // Service
+    'service': 'addon/services/{{name}}.js',
+    'service-unit-test': 'tests/unit/services/{{name}}-test.js',
+
+    // Util
+    'util': 'addon/utils/{{name}}.js',
+    'util-unit-test': 'tests/unit/utils/{{name}}-test.js'
   },
   app: {
     // Component (global)
@@ -83,19 +111,15 @@ const moduleGroups = [
   ['util', 'util-unit-test']
 ]
 
-function getModules (types) {
-  let _modules = []
-  types.forEach(type => {
-    _modules = _modules.concat(Object.keys(modules[type]).map(key => {
-      return { type, key, path: modules[type][key] }
-    }))
+function getModules (projectType) {
+  return Object.keys(modules[projectType]).map(key => {
+    return { key, path: modules[projectType][key] }
   })
-  return _modules
 }
 
-function findModule (rootPath, filePath) {
+function findModule (rootPath, projectType, filePath) {
   let regex = null
-  const module = getModules(['app', 'addon']).find(module => {
+  const module = getModules(projectType).find(module => {
     const pathRegex = `^${module.path
       .replace(/\//g, '\\/')
       .replace(/\./g, '\\.')
@@ -124,14 +148,14 @@ function findModule (rootPath, filePath) {
   return
 }
 
-function findNextModule (rootPath, filePath) {
-  const module = findModule(rootPath, filePath)
+function findNextModule (rootPath, projectType, filePath) {
+  const module = findModule(rootPath, projectType, filePath)
 
   if (!module) {
     return
   }
 
-  const { type, key, name, prefix } = module
+  const { key, name, prefix } = module
 
   const moduleGroup = moduleGroups
     .find(moduleGroup => moduleGroup.indexOf(key) !== -1)
@@ -146,7 +170,7 @@ function findNextModule (rootPath, filePath) {
 
     // Check to see if the module exists in the file system
     const nextModuleKey = moduleGroup[nextModuleIndex]
-    const nextModule = getModules([type]).find(module => module.key === nextModuleKey)
+    const nextModule = getModules(projectType).find(module => module.key === nextModuleKey)
     const { path: nextModulePath } = nextModule
     const _nextModulePathInstance = nextModulePath.replace('{{name}}', name).replace('{{prefix}}', prefix)
     if (fs.existsSync(path.join(rootPath, _nextModulePathInstance))) {

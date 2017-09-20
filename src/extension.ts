@@ -1,7 +1,12 @@
+const fs = require('fs')
+const path = require('path')
+
 import { ExtensionContext, Uri, commands, window, workspace } from 'vscode'
 import { resolve } from 'path'
 
 import findNextModule from './find-next-module'
+
+const { join } = path
 
 export function activate(context: ExtensionContext) {
   const disposable = commands.registerCommand('extension.emberFileCarousel', () => {
@@ -14,9 +19,10 @@ export function activate(context: ExtensionContext) {
     // const podModulePrefixTokens = podModulePrefix.split('/')
     // podModulePrefix = podModulePrefixTokens[podModulePrefixTokens.length - 1]
 
+    const projectType = fs.existsSync(path.join(workspace.rootPath, 'addon')) ? 'addon' : 'app'
     const relativeFileName = workspace.asRelativePath(window.activeTextEditor.document.fileName)
 
-    const nextModulePathInstance = findNextModule(workspace.rootPath, relativeFileName)
+    const nextModulePathInstance = findNextModule(workspace.rootPath, projectType, relativeFileName)
     if (nextModulePathInstance) {
       const uri = Uri.parse(`file://${workspace.rootPath}/${nextModulePathInstance}`)
       workspace.openTextDocument(uri).then(document => {
