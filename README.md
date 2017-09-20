@@ -12,7 +12,9 @@ code --install-extension vsc-ember-file-carousel-0.0.1.vsix
 
 ## Features
 
-Open an Ember file and press ⌘⇧R (command-shift-R) to rotate between the related files in the project
+With an Ember file in focus:
+* `ctrl-shift-cmd-N` to cycle to the next related file in the project
+* `ctrl-shift-cmd-P` to cycle to the previous related file in the project
 
 ### Module groups
 
