@@ -3,15 +3,15 @@ const path = require('path')
 
 const { join } = path
 
-// TODO: Route / component styles
-// TODO: Test behaviours (needs blueprint updates)
-// TODO: Engines
+// TODO: Behaviour files for tests (needs blueprint updates)
+// TODO: Engines (enhance addon)
 // TODO: Dummy apps
 const modules = {
   addon: {
     // Component
     'component-js': 'addon/components/{{name}}.js',
     'component-hbs': 'addon/templates/components/{{name}}.hbs',
+    'component-css': 'addon/styles/{{name}}.css',
     'component-integration-test': 'tests/integration/components/{{name}}-test.js',
     'component-unit-test': 'tests/unit/components/{{name}}-test.js',
 
@@ -44,12 +44,14 @@ const modules = {
     // Component (global)
     'component-js': 'app/pods/components/{{name}}/component.js',
     'component-hbs': 'app/pods/components/{{name}}/template.hbs',
+    'component-css': 'app/pods/components/{{name}}/styles.css',
     'component-integration-test': 'tests/integration/pods/components/{{name}}/component-test.js',
     'component-unit-test': 'tests/unit/pods/components/{{name}}/component-test.js',
 
     // Component (local)
     'local-component-js': 'app/pods/{{prefix}}-components/{{name}}/component.js',
     'local-component-hbs': 'app/pods/{{prefix}}-components/{{name}}/template.hbs',
+    'local-component-css': 'app/pods/{{prefix}}-components/{{name}}/styles.css',
     'local-component-integration-test': 'tests/integration/pods/components/{{prefix}}-components/{{name}}/component-test.js',
     'local-component-unit-test': 'tests/unit/pods/components/{{prefix}}-components/{{name}}/component-test.js',
 
@@ -84,6 +86,7 @@ const modules = {
     'route-js': 'app/pods/{{name}}/route.js',
     'controller-js': 'app/pods/{{name}}/controller.js',
     'route-hbs': 'app/pods/{{name}}/template.hbs',
+    'route-css': 'app/pods/{{name}}/styles.css',
     'route-acceptance-test': 'tests/acceptance/{{name}}-test.js',
     'route-unit-test': 'tests/unit/pods/{{name}}/route-test.js',
     'controller-unit-test': 'tests/unit/pods/{{name}}/controller-test.js',
@@ -99,14 +102,14 @@ const modules = {
 }
 
 const moduleGroups = [
-  ['component-js', 'component-hbs', 'component-integration-test', 'component-unit-test'], // Global
-  ['local-component-js', 'local-component-hbs', 'local-component-integration-test', 'local-component-unit-test'], // Local
+  ['component-js', 'component-hbs', 'component-css', 'component-integration-test', 'component-unit-test'], // Global
+  ['local-component-js', 'local-component-hbs', 'local-component-css', 'local-component-integration-test', 'local-component-unit-test'], // Local
   ['helper-js', 'helper-integration-test', 'helper-integration-test-behaviours'],
   ['initializer', 'initializer-unit-test'],
   ['instance-initializer', 'instance-initializer-unit-test'],
   ['mixin', 'mixin-unit-test'],
   ['model', 'model-unit-test', 'adapter-js', 'adapter-unit-test', 'serializer', 'serializer-unit-test', 'transform', 'transform-unit-test'],
-  ['route-js', 'controller-js', 'route-hbs', 'route-acceptance-test', 'route-unit-test', 'controller-unit-test'],
+  ['route-js', 'controller-js', 'route-hbs', 'route-css', 'route-acceptance-test', 'route-unit-test', 'controller-unit-test'],
   ['service', 'service-unit-test'],
   ['util', 'util-unit-test']
 ]

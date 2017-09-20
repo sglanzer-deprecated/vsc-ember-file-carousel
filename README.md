@@ -17,7 +17,7 @@ Open an Ember file and press ⌘⇧R (command-shift-R) to rotate between the rel
 ### Module groups
 
 #### Components
-['component-js', 'component-hbs', 'component-integration-test', 'component-unit-test']
+['component-js', 'component-hbs', 'component-css', 'component-integration-test', 'component-unit-test']
 
 #### Helpers
 ['helper-js', 'helper-integration-test', 'helper-integration-test-behaviours']
@@ -35,7 +35,7 @@ Open an Ember file and press ⌘⇧R (command-shift-R) to rotate between the rel
 ['model', 'model-unit-test', 'adapter-js', 'adapter-unit-test', 'serializer', 'serializer-unit-test', 'transform', 'transform-unit-test']
 
 #### Route / Controller
-['route-js', 'controller-js', 'route-hbs', 'route-acceptance-test', 'route-unit-test', 'controller-unit-test']
+['route-js', 'controller-js', 'route-hbs', 'route-css', 'route-acceptance-test', 'route-unit-test', 'controller-unit-test']
 
 #### Service
 ['service', 'service-unit-test']
