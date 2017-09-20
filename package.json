@@ -1,60 +1,62 @@
 {
-    "name": "vsc-ember-file-carousel",
-    "displayName": "vsc-ember-file-carousel",
-    "description": "Cycle between related Ember files",
-    "version": "0.0.1",
-    "publisher": "sglanzer",
-    "engines": {
-        "vscode": "^1.16.0"
-    },
-    "categories": [
-        "Other"
+  "name": "vsc-ember-file-carousel",
+  "displayName": "vsc-ember-file-carousel",
+  "description": "Cycle between related Ember files",
+  "version": "0.0.1",
+  "publisher": "sglanzer",
+  "engines": {
+    "vscode": "^1.16.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.emberFileCarouselNext",
+    "onCommand:extension.emberFileCarouselPrevious"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.emberFileCarouselNext",
+        "title": "Ember file carousel - next"
+      },
+      {
+        "command": "extension.emberFileCarouselPrevious",
+        "title": "Ember file carousel - previous"
+      }
     ],
-    "activationEvents": [
-      "onCommand:extension.emberFileCarouselNext",
-      "onCommand:extension.emberFileCarouselPrevious"
-    ],
-    "main": "./out/src/extension",
-    "contributes": {
-      "commands": [
-          {
-            "command": "extension.emberFileCarouselNext",
-            "title": "Ember file carousel - next"
-          },
-          {
-            "command": "extension.emberFileCarouselPrevious",
-            "title": "Ember file carousel - previous"
-          }
-      ],
-      "keybindings": [
-          {
-            "mac": "ctrl+cmd+shift+n",
-            "win": "ctrl+alt+shift+n",
-            "linux": "ctrl+alt+shift+n",
-            "key": "ctrl+alt+shift+n",
-            "command": "extension.emberFileCarouselNext"
-          },
-          {
-            "mac": "ctrl+cmd+shift+p",
-            "win": "ctrl+alt+shift+p",
-            "linux": "ctrl+alt+shift+p",
-            "key": "ctrl+alt+shift+p",
-            "command": "extension.emberFileCarouselPrevious"
-          }
-      ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.5.2",
-        "vscode": "^1.1.5",
-        "mocha": "^3.5.0",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
-    }
+    "keybindings": [
+      {
+        "mac": "ctrl+cmd+shift+n",
+        "win": "ctrl+alt+shift+n",
+        "linux": "ctrl+alt+shift+n",
+        "key": "ctrl+alt+shift+n",
+        "command": "extension.emberFileCarouselNext"
+      },
+      {
+        "mac": "ctrl+cmd+shift+p",
+        "win": "ctrl+alt+shift+p",
+        "linux": "ctrl+alt+shift+p",
+        "key": "ctrl+alt+shift+p",
+        "command": "extension.emberFileCarouselPrevious"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "vsce package",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^7.0.43",
+    "mocha": "^3.5.0",
+    "typescript": "^2.5.2",
+    "vsce": "^1.30.0",
+    "vscode": "^1.1.5"
+  }
 }
