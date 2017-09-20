@@ -4,7 +4,6 @@ const path = require('path')
 const { join } = path
 
 // TODO: Behaviour files for tests (needs blueprint updates)
-// TODO: Dummy apps
 const modules = {
   addon: {
     // Component
@@ -116,6 +115,29 @@ const modules = {
     // Util
     'util': 'app/utils/{{name}}.js',
     'util-unit-test': 'tests/unit/utils/{{name}}-test.js'
+  },
+  dummy: {
+    // Component (global)
+    'component-js': 'tests/dummy/app/pods/components/{{name}}/component.js',
+    'component-hbs': 'tests/dummy/app/pods/components/{{name}}/template.hbs',
+    'component-css': 'tests/dummy/app/pods/components/{{name}}/styles.css',
+
+    // Component (local)
+    'local-component-js': 'tests/dummy/app/pods/{{prefix}}-components/{{name}}/component.js',
+    'local-component-hbs': 'tests/dummy/app/pods/{{prefix}}-components/{{name}}/template.hbs',
+    'local-component-css': 'tests/dummy/app/pods/{{prefix}}-components/{{name}}/styles.css',
+
+    // Model / Adapter / Serializer / Transform
+    'model': 'tests/dummy/app/models/{{name}}.js',
+    'adapter-js': 'tests/dummy/app/adapters/{{name}}.js',
+    'serializer': 'tests/dummy/app/serializers/{{name}}.js',
+    'transform': 'tests/dummy/app/transforms/{{name}}.js',
+
+    // Route / Controller
+    'route-js': 'tests/dummy/app/pods/{{name}}/route.js',
+    'controller-js': 'tests/dummy/app/pods/{{name}}/controller.js',
+    'route-hbs': 'tests/dummy/app/pods/{{name}}/template.hbs',
+    'route-css': 'tests/dummy/app/pods/{{name}}/styles.css'
   }
 }
 
@@ -171,7 +193,12 @@ function findModules (rootPath, projectType, filePath) {
 }
 
 function findNextModule (rootPath, projectType, filePath) {
-  const modules = findModules(rootPath, projectType, filePath)
+  let specificProjectType = projectType
+  if (projectType === 'addon' && filePath.includes('dummy')) {
+    specificProjectType = 'dummy'
+  }
+
+  const modules = findModules(rootPath, specificProjectType, filePath)
 
   if (!modules) {
     return
@@ -195,12 +222,16 @@ function findNextModule (rootPath, projectType, filePath) {
 
       // Check to see if the module exists in the file system
       const nextModuleKey = moduleGroup[nextModuleIndex]
-      const nextModule = getModules(projectType).find(module => module.key === nextModuleKey)
-      const { path: nextModulePath } = nextModule
-      const _nextModulePathInstance = nextModulePath.replace('{{name}}', name).replace('{{prefix}}', prefix)
-      if (fs.existsSync(path.join(rootPath, _nextModulePathInstance))) {
-        nextModulePathInstance = _nextModulePathInstance
-        break
+      const nextModule = getModules(specificProjectType).find(module => module.key === nextModuleKey)
+
+      // Not all project types have all the modules (e.g. dummy)
+      if (nextModule) {
+        const { path: nextModulePath } = nextModule
+        const _nextModulePathInstance = nextModulePath.replace('{{name}}', name).replace('{{prefix}}', prefix)
+        if (fs.existsSync(path.join(rootPath, _nextModulePathInstance))) {
+          nextModulePathInstance = _nextModulePathInstance
+          break
+        }
       }
 
       modulesChecked = modulesChecked + 1
